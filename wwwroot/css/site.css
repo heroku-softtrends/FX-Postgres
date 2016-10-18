@@ -1,0 +1,170 @@
+﻿html, body {
+    height: 100%;
+}
+
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+.btn-custom {
+  background-color: hsl(208, 100%, 39%) !important;
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#006ac6", endColorstr="#006ac6");
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#006ac6), to(#006ac6));
+  background-image: -moz-linear-gradient(top, #006ac6, #006ac6);
+  background-image: -ms-linear-gradient(top, #006ac6, #006ac6);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #006ac6), color-stop(100%, #006ac6));
+  background-image: -webkit-linear-gradient(top, #006ac6, #006ac6);
+  background-image: -o-linear-gradient(top, #006ac6, #006ac6);
+  background-image: linear-gradient(#006ac6, #006ac6);
+  border-color: #006ac6 #006ac6 hsl(208, 100%, 39%);
+  border-radius: 6px;
+  color: #fff !important;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.00);
+  -webkit-font-smoothing: antialiased;
+}
+.btn-custom2 {
+  background-color: rgb(255, 165, 0) !important;
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffa500", endColorstr="#ffa500");
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#ffa500), to(#ffa500));
+  background-image: -moz-linear-gradient(top, #ffa500, #ffa500);
+  background-image: -ms-linear-gradient(top, #ffa500, #ffa500);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffa500), color-stop(100%, #ffa500));
+  background-image: -webkit-linear-gradient(top, #ffa500, #ffa500);
+  background-image: -o-linear-gradient(top, #ffa500, #ffa500);
+  background-image: linear-gradient(#ffa500, #ffa500);
+  border-color: #ffa500 #ffa500 rgb(255, 165, 0);
+  border-radius: 6px;
+  color: #fff !important;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.00);
+  -webkit-font-smoothing: antialiased;
+}
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set widths on the form inputs since otherwise they're 100% wide */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+#spinner {
+    display: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -45px;
+    right: 0;
+    text-align: center;
+    background: url('../images/ajax-loader.gif') no-repeat center #fff;
+    padding: 10px;
+    font: normal 16px Tahoma, Geneva, sans-serif;
+    border: 1px solid #666;
+    z-index: 2;
+    opacity: 0.5;
+}
+
+.mobile-content {
+    height: 600px;
+    width: 292px;
+    background: url(../images/onlydevice.png) no-repeat;
+    position: relative;
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: left top;
+    margin-left: -14%;
+}
+
+.mobile-monitor {
+    position: relative;
+    top: 20%;
+    left: 16%;
+    width: 69%;
+}
+
+    .mobile-monitor input[type=button] {
+        background-color: #0070d2;
+        color: white;
+        width: 100%;
+        padding: 0.8em;
+        border: 2px solid #337ab7;
+    }
+
+    .mobile-monitor label {
+        font-size: 11px;
+        color: gray;
+    }
+
+    .mobile-monitor p {
+        margin: 0px;
+    }
+
+    .mobile-monitor .ui-slider {
+        margin: 8px 0px 0px 2px;
+    }
+
+.default-status-message {
+    margin-top: 5%;
+    margin-bottom: 3%;
+    color: white;
+    padding: 2px;
+    text-align: center;
+}
+
+.wrapword {
+    white-space: -moz-pre-wrap !important;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    white-space: -webkit-pre-wrap;
+    word-break: break-all;
+    white-space: normal;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
+
+    .mobile-monitor {
+        margin: 0 auto;
+        position: relative;
+        top: 10%;
+        left: 0%;
+    }
+
+    .mobile-content {
+        background: none !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin: 5% auto;
+        height: 100%;
+        width: 100%;
+        left: 0%;
+    }
+
+    footer {
+        text-align: center;
+    }
+}

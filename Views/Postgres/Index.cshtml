@@ -1,0 +1,157 @@
+﻿@{
+    ViewData["Title"] = "Web Traffic";
+}
+
+<div class="container-fluid" style="padding:0px;margin-top:1%;">
+    <div class="col-md-12" style="padding:0px;">
+        <div class="col-md-3" style="padding-left:0px;">
+            <label for="clientID" style="float:left;margin-right:2%;line-height:35px;">ClientID</label>
+            <input style="width:40%;" type="text" class="form-control" id="clientID" value="@String.Format("{0:n0}", ViewBag.ClientID)">
+        </div>
+        <div class="col-lg-3" style="padding-left:0px;">
+            <label for="trafficUrl" style="float:left;margin-right:2%;line-height:35px;">Event Source</label>
+            <select class="dropdown" style="width:50%;padding:6px;">
+                <option value="LandingPage">LandingPage</option>
+                <option value="FacebookTab">FacebookTab</option>
+                <option value="Microsite">Microsite</option>
+                <option value="Web">Web</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-12" style="padding:0px;margin-top:2%;vertical-align:middle">
+        <div class="col-md-5" style="padding:0px;">
+            <p style="text-align:center;font-weight:bold;">Kafka Topic (FX-VIP)</p>
+            <div class="table-responsive" style="max-height:450px;overflow-y: auto;padding:0px;">
+                <table id="kafkaDataTable" class="table-bordered" style="width:100%;min-height:450px;"></table>
+            </div>
+            <p style="text-align:center;font-weight:bold;color:orange;margin-top:10px;" id="kafkaMessage">&nbsp;</p>
+        </div>
+        <div class="col-md-2" style="height:400px;margin-top:13%;">
+            <input id="btnReadFromFirst" type="button" value="Read from offset 0" class="btn-custom" style="width:100%;" />
+            <input id="btnReadFromLast" type="button" value="Read from last offset" class="btn-custom" style="width:100%;margin-top:10%;" />
+            <input id="btnWriteFromFirst" type="button" value="Write from offset 0" class="btn-custom" style="width:100%;margin-top:10%;" />
+            <input id="btnWriteFromLast" type="button" value="Write from last offset" class="btn-custom" style="width:100%;margin-top:10%;" />
+        </div>
+        <div class="col-md-5" style="padding:0px">
+            <p style="text-align:center;font-weight:bold;">Postgres DB (FX-VIP)</p>
+            <div class="table-responsive" style="max-height:450px;overflow-y: auto;padding:0px;">
+                <table id="postgresDataTable" class="table-bordered" style="width:100%;min-height:450px;"></table>
+            </div>
+            <p style="text-align:center;font-weight:bold;color:green;margin-top:10px;" id="postgresMessage">&nbsp;</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        var urlReadAction = '/Postgres/ReadKafkaMessage';
+        var urlWriteAction = '/Postgres/WriteKafkaMessage';
+        var isSentData = false;
+        var startProcess, btnText, btnBgColor;
+        var kafkaMessage = [], isReadFromFirst = false, isWriteFromFirst = false;
+
+        $(function () {
+            $('#spinner').hide();
+            bindTrafficDataTable(true);
+            bindTrafficDataTable(false);
+            $('#btnReadFromFirst').on('click', function (e) {
+                isReadFromFirst = true;
+                setActiveButtonBG($(this));
+                resetTrafficTable(true);
+                resetTrafficTable(false);
+                readKafkaMessage();
+            });
+            $('#btnReadFromLast').on('click', function (e) {
+                isReadFromFirst = false;
+                setActiveButtonBG($(this));
+                resetTrafficTable(true);
+                resetTrafficTable(false);
+                readKafkaMessage();
+            });
+            $('#btnWriteFromFirst').on('click', function (e) {
+                if (kafkaMessage == undefined || (kafkaMessage && kafkaMessage.length == 0))
+                    return;
+                isWriteFromFirst = true;
+                setActiveButtonBG($(this));
+                resetTrafficTable(false);
+                writeKafkaMessage();
+            });
+            $('#btnWriteFromLast').on('click', function (e) {
+                if (kafkaMessage == undefined || (kafkaMessage && kafkaMessage.length == 0))
+                    return;
+                isWriteFromFirst = false;
+                setActiveButtonBG($(this));
+                resetTrafficTable(false);
+                writeKafkaMessage();
+            });
+        });
+
+        function setActiveButtonBG(activeButton) {
+            $('input[type=button]').each(function () {
+                if ($(this).attr('id') == activeButton.attr('id'))
+                    $(this).addClass('btn-custom2');
+                else {
+                    $(this).removeClass('btn-custom2');
+                }
+            })
+        }
+        function resetTrafficTable(isKafka) {
+            var trafficTable = isKafka ? $('#kafkaDataTable') : $('#postgresDataTable');
+            trafficTable.find("tr").remove();
+            if (isKafka)
+                $('#kafkaMessage').html('');
+            else
+                $('#postgresMessage').html('');
+        }
+
+        function bindTrafficDataTable(isKafka) {
+            var tableDataRow;
+            var trafficTable = isKafka ? $('#kafkaDataTable') : $('#postgresDataTable');
+            tableDataRow = trafficTable.find("tr:gt(0)");
+            if (kafkaMessage && kafkaMessage.length > 0) {
+                tableDataRow.find('tr').remove();
+                for (var i = 0; i < kafkaMessage.length; i++) {
+                    if (kafkaMessage[i].message) {
+                        trafficTable.append("<tr><td style='border-bottom: 1px solid #ddd;'><div class='wrapword'>" + kafkaMessage[i].message + "</div></td></tr>");
+                        tableDataRow = trafficTable.find("tr:gt(0)");
+                    }
+                }
+                if (isKafka) {
+                    if (isReadFromFirst)
+                        $('#kafkaMessage').html('Messages from offset 0 (All ' + kafkaMessage.length + ')');
+                    else
+                        $('#kafkaMessage').html('Messages ' + kafkaMessage[0].offset + ' - ' + kafkaMessage[kafkaMessage.length - 1].offset + '(' + kafkaMessage.length + ' Messages)');
+                }
+                else {
+                    if (isWriteFromFirst)
+                        $('#postgresMessage').html('Write all from offset 0 to ' + kafkaMessage.length + ' to Postgres');
+                    else
+                        $('#postgresMessage').html('Write from ' + kafkaMessage[0].offset + ' to ' + kafkaMessage[kafkaMessage.length - 1].offset + ' to Postgres');
+                }
+            }
+            if (tableDataRow.length == 0) {
+                tableDataRow.remove();
+                trafficTable.append("<tr class='emptyrow'><td style='text-align:center;'>No Record Found</td></tr>");
+            }
+        }
+        function readKafkaMessage() {
+            kafkaMessage = [];
+            $('#spinner').show();
+            $.post(urlReadAction, { eventSource: $('.dropdown').val(), isReadFromFirst: isReadFromFirst }, function (data) {
+                $('#spinner').hide();
+                kafkaMessage = data;
+                bindTrafficDataTable(true)
+            });
+        }
+        function writeKafkaMessage() {
+            $('#spinner').show();
+            $.post(urlWriteAction, { kafkaMessage: kafkaMessage, isWriteFromFirst: isWriteFromFirst }, function (data) {
+                $('#spinner').hide();
+                console.log(data);
+                if (data == "success") {
+                    bindTrafficDataTable(false)
+                }
+            });
+        }
+    </script>
+}
